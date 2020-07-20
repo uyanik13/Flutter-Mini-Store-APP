@@ -1,0 +1,298 @@
+
+
+import 'dart:convert';
+
+import 'package:autocomplete_textfield/autocomplete_textfield.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:store_app/models/user_helper_model.dart';
+
+import 'package:store_app/providers/store_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
+import 'package:store_app/providers/auth_provider.dart';
+import 'package:store_app/providers/user_provider.dart';
+import 'package:store_app/screens/user_screens/views/app_bar_view.dart';
+import 'package:store_app/services/check_internet_connection_service.dart';
+
+import 'package:store_app/utils/styles/user_app_theme.dart';
+
+
+class AddNewShoppingTab extends StatefulWidget {
+  @override
+  _AddNewShoppingTab createState() => _AddNewShoppingTab();
+}
+
+class _AddNewShoppingTab extends State<AddNewShoppingTab> with SingleTickerProviderStateMixin {
+  AnimationController animationController;
+  final _formKey = GlobalKey<FormState>();
+  final _shoppingNameFieldController = TextEditingController(text:'');
+  final _shoppingDescFieldController = TextEditingController(text:'');
+  final _shoppingUserFieldController = TextEditingController(text:'');
+  final FocusNode myFocusNode = FocusNode();
+  String _userSelectedItem;
+
+
+
+
+
+
+  @override
+  void initState() {
+    setState(() {
+      // initThings(context);
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the Widget is disposed
+    myFocusNode.dispose();
+    _shoppingNameFieldController.dispose();
+    _shoppingDescFieldController.dispose();
+    _shoppingUserFieldController.dispose();
+    super.dispose();
+  }
+
+
+
+
+
+
+ /* Future<void> initThings(BuildContext context) async {
+    try {
+      final AuthProvider _authProvider = context.read<AuthProvider>();
+      _authProvider.currentUser(_authProvider.token).then((user) => {
+        print('USER ${user.storeName}'),
+        _nameFieldController.text = user.name?.toString()?? 'yükleniyor',
+        _storeNameFieldController.text = user.storeName?? 'yükleniyor',
+        _phoneFieldController.text = user.phone?.toString()?? 'yükleniyor',
+        _emailFieldController.text = user.email?.toString()?? 'yükleniyor',
+      });
+    } catch (e) {
+      print("initThings : $e");
+    }
+  }*/
+
+  Future<void> _submit(BuildContext context) async {
+    final AuthProvider _authProvider = context.read<AuthProvider>();
+    if (await checkNetworkConnection(context)) {
+      final postBody = {
+        "name": _shoppingNameFieldController.text,
+      };
+      await context.read<UserProvider>().updateUser(context,_authProvider.user.id,postBody,_authProvider.token);
+    }
+  }
+
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    final AuthProvider _authProvider = context.watch<AuthProvider>();
+    final _storeProvider = context.watch<StoreProvider>();
+    return Container(
+      color: UserAppTheme.background,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: PreferredSize(
+            preferredSize: Size.fromRadius(30.0), child: AppBarView('itemPage'.tr())),
+        body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Form(
+                  key:_formKey,
+                  child:Padding(
+                    padding: EdgeInsets.all(22.0),
+                    child: Column(
+                      children: <Widget>[
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            SizedBox(height: 10),
+                            Text(
+                              'addNewInvoice'.tr(),
+                              style: TextStyle(
+                                  fontSize: 24, fontWeight: FontWeight.w600),
+                            ),
+                            SizedBox(height: 10),
+                            Container(
+                              width: MediaQuery.of(context).size.width / 1.2,
+                              child: TextFormField(
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'nameRequired'.tr();
+                                  }
+                                  return null;
+                                },
+                                keyboardType: TextInputType.text,
+                                decoration: InputDecoration(
+                                  focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.white,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  border: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        width: 1,
+                                      )),
+                                  enabledBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Color(0xff9785B7),
+                                        width: 1,
+                                      )),
+                                  contentPadding: EdgeInsets.all(20),
+                                  hintText: 'shoppingName'.tr(),
+                                  hintStyle: TextStyle(color: Color(0xff9785B7)),
+                                  focusColor: Colors.red,
+                                  hoverColor: Colors.green,
+                                  prefixStyle: TextStyle(color: Colors.white),
+                                  prefixIcon: Icon(
+                                    FontAwesomeIcons.envelopeOpenText,
+                                    color: Color(0xff9785B7),
+                                    size: 17,
+                                  ),
+                                ),
+                                enabled: true,
+                                controller: _shoppingNameFieldController,
+                              ),
+                            ),
+                            Container(
+                              width: MediaQuery.of(context).size.width / 1.2,
+                              child: TextFormField(
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'nameRequired'.tr();
+                                  }
+                                  return null;
+                                },
+                                keyboardType: TextInputType.text,
+                                decoration: InputDecoration(
+                                  focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.white,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  border: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        width: 1,
+                                      )),
+                                  enabledBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Color(0xff9785B7),
+                                        width: 1,
+                                      )),
+                                  contentPadding: EdgeInsets.all(20),
+                                  hintText: 'shoppingDesc'.tr(),
+                                  hintStyle: TextStyle(color: Color(0xff9785B7)),
+                                  focusColor: Colors.red,
+                                  hoverColor: Colors.green,
+                                  prefixStyle: TextStyle(color: Colors.white),
+                                  prefixIcon: Icon(
+                                    FontAwesomeIcons.audioDescription,
+                                    color: Color(0xff9785B7),
+                                    size: 17,
+                                  ),
+                                ),
+                                enabled: true,
+                                controller: _shoppingDescFieldController,
+                              ),
+                            ),
+                            TypeAheadFormField(
+                              textFieldConfiguration: TextFieldConfiguration(
+                                  controller: this._shoppingUserFieldController,
+                                  decoration: InputDecoration(
+                                      labelText: 'Users'
+                                  )
+                              ),
+                              suggestionsCallback: (pattern) {
+                                return _storeProvider.fetchUsersByOptionsForStore(pattern,_authProvider.token);
+                              },
+                              itemBuilder: (context, suggestion) {
+                                return ListTile(
+                                  title: Text(suggestion),
+                                );
+                              },
+                              transitionBuilder: (context, suggestionsBox, controller) {
+                                return suggestionsBox;
+                              },
+                              onSuggestionSelected: (suggestion) {
+                                this._shoppingUserFieldController.text = suggestion;
+                              },
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please select an user';
+                                } return 'Please select an user';
+                              },
+                              onSaved: (value) => this._userSelectedItem = value,
+                            ),
+                            SizedBox(height: 10.0,),
+                            /*RaisedButton(
+                              onPressed: () {
+                                _submit(context);
+                              },
+                              textColor: Colors.white,
+                              padding: const EdgeInsets.all(0.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: Container(
+                                width: MediaQuery.of(context).size.width / 1.2,
+                                height: 60,
+                                decoration: const BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: <Color>[
+                                      CustomColors.BlueLight,
+                                      CustomColors.BlueDark,
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(8.0),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: CustomColors.BlueShadow,
+                                      blurRadius: 2.0,
+                                      spreadRadius: 1.0,
+                                      offset: Offset(0.0, 0.0),
+                                    ),
+                                  ],
+                                ),
+                                padding:
+                                const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                                child: Center(
+                                  child:  Text(
+                                    'addNewInvoice'.tr(),
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                              ),
+                            ),*/
+                            SizedBox(height: 20),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+
+
+}
+
+
+
+
