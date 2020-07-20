@@ -1,7 +1,12 @@
-# best_flutter_ui_templates
+# Flutter Store App
 
-A new Flutter project.
+Flutter Project with laravel + Rest API
 
+![alt text](screenshots/1.png)
+demo:https://play.google.com/store/apps/details?id=com.dijitalreklam.storeapp&hl=tr
+
+
+laravel app:https://github.com/uyanik13/store
 ## Getting Started
 
 This project is a starting point for a Flutter application.
